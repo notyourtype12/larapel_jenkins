@@ -1,32 +1,20 @@
-pipeline {
-    agent any
+node {
 
-    stages {
-
-        stage('Clone Repository') {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                sh 'composer install --no-interaction'
-            }
-        }
-
-        stage('Setup Laravel') {
-            steps {
-                sh 'cp .env.example .env'
-                sh 'php artisan key:generate'
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                sh 'php artisan test'
-            }
-        }
-
+    stage('Checkout') {
+        checkout scm
     }
+
+    stage('Build') {
+        docker.image('composer:latest').inside('-u root') {
+            sh 'rm -f composer.lock'
+            sh 'composer install'
+        }
+    }
+
+    stage('Testing') {
+        docker.image('ubuntu').inside('-u root') {
+            sh 'echo "Ini adalah test pipeline Jenkins"'
+        }
+    }
+
 }
