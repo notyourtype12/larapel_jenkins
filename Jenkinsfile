@@ -9,17 +9,17 @@ pipeline {
 
     stages {
         stage('Deploy') {
-            steps {
-                sshagent(['ssh-prod']) {
-                    sh '''
-                    mkdir -p /root/.ssh
-                    ssh-keyscan -H $DEPLOY_HOST >> /root/.ssh/known_hosts
+    steps {
+        sshagent(['ssh-prod']) {
+            sh '''
+            mkdir -p ~/.ssh
+            ssh-keyscan -H prod.kelasdevops.xyz >> ~/.ssh/known_hosts
 
-                    rsync -rav --delete ./ $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH \
-                    --exclude=.env --exclude=storage --exclude=.git
-                    '''
-                }
-            }
+            rsync -rav --delete ./ ajiiee@prod.kelasdevops.xyz:/home/ajiiee/ansible-deploy/prod.kelasdevops.xyz/ \
+            --exclude=.env --exclude=storage --exclude=.git
+            '''
         }
+    }
+}
     }
 }
