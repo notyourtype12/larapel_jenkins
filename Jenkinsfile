@@ -24,7 +24,7 @@ stage('Deploy') {
 
             sh 'ssh-keyscan -H "$PROD_HOST" >> ~/.ssh/known_hosts || true'
 
-            sh 'rsync -rav --delete ./ adms26@$PROD_HOST:/home/adms26/ansible-deploy/prod.kelasdevops.xyz/ --exclude=.env --exclude=storage --exclude=.git'
+            sh 'rsync -rav --delete ./ ajiiee@$PROD_HOST:/home/ajiiee/ansible-deploy/prod.kelasdevops.xyz/ --exclude=.env --exclude=storage --exclude=.git'
         }
     }
 }
