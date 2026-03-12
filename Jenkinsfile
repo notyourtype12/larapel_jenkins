@@ -1,30 +1,25 @@
-node {
+pipeline {
+    agent any
 
-}
-
-stage('Build') {
-    docker.image('composer:latest').inside('-u root') {
-        sh 'rm -f composer.lock'
-        sh 'composer install'
+    environment {
+        DEPLOY_USER = 'ajiiee'
+        DEPLOY_HOST = 'prod.kelasdevops.xyz'
+        DEPLOY_PATH = '/home/ajiiee/ansible-deploy/prod.kelasdevops.xyz'
     }
-}
 
-stage('Testing') {
-    docker.image('ubuntu').inside('-u root') {
-        sh 'echo "Ini adalah test pipeline Jenkins"'
-    }
-}
+    stages {
+        stage('Deploy') {
+            steps {
+                sshagent(['SSH PROD']) {
+                    sh '''
+                    mkdir -p /root/.ssh
+                    ssh-keyscan -H $DEPLOY_HOST >> /root/.ssh/known_hosts
 
-// deploy env prod
-stage('Deploy') {
-    docker.image('agung3wi/alpine-rsync:1.1').inside('-u root') {
-        sshagent (credentials: ['ssh-prod']) {
-
-            sh 'mkdir -p ~/.ssh'
-
-            sh 'ssh-keyscan -H "$PROD_HOST" >> ~/.ssh/known_hosts || true'
-
-            sh 'rsync -rav --delete ./ ajiiee@$PROD_HOST:/home/ajiiee/ansible-deploy/prod.kelasdevops.xyz/ --exclude=.env --exclude=storage --exclude=.git'
+                    rsync -rav --delete ./ $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH \
+                    --exclude=.env --exclude=storage --exclude=.git
+                    '''
+                }
+            }
         }
     }
 }
